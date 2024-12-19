@@ -246,7 +246,7 @@ export const MonitoringDashboard = () => {
   return (
     <div className="container mx-auto p-6 rounded-2xl bg-gradient-to-br from-blue-200 to-pink-200 min-h-screen">
       <h1 className="text-4xl font-extrabold mb-8 text-center text-gray-800 tracking-tight">
-        Incubator hi
+        Incubator Monitoring Dashboard
       </h1>
 
       {/* Back Button with Left Arrow */}
