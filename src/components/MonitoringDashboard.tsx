@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { dbA, doc, onSnapshot } from "../config/firebaseConfig";
 import { motion } from "framer-motion";
+// import { Notification } from "./Notification";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -111,7 +112,15 @@ export const MonitoringDashboard = () => {
   const [incubator, setIncubator] = useState<Incubator | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [loading, setLoading] = useState(false);
-  const [metricsData, setMetricsData] = useState({
+  type MetricsData = {
+    labels: string[];
+    temperature: number[];
+    humidity: number[];
+    airQualityIndex: number[];
+    uvRadiation: number[];
+    lightIntensity: number[];
+  };
+  const [metricsData, setMetricsData] = useState<MetricsData>({
     labels: [],
     temperature: [],
     humidity: [],
@@ -119,6 +128,103 @@ export const MonitoringDashboard = () => {
     uvRadiation: [],
     lightIntensity: [],
   });
+
+  // const [metricsData, setMetricsData] = useState({
+  //   labels: [],
+  //   temperature: [],
+  //   humidity: [],
+  //   airQualityIndex: [],
+  //   uvRadiation: [],
+  //   lightIntensity: [],
+  // });
+
+
+  // const [notifications, setNotifications] = useState<string[]>([]);
+
+  // // Fetch data based on selected date and time
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const isRealTime =
+  //       selectedDateTime.toISOString().split("T")[0] ===
+  //       new Date().toISOString().split("T")[0];
+
+  //     if (isRealTime) {
+  //       const data = await fetchRealTimeData();
+  //       setIncubator(data);
+  //     } else {
+  //       const data = await fetchHistoricalData(selectedDateTime);
+  //       setIncubator(data);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, [selectedDateTime]);
+
+  // // Function to add a notification
+  // const addNotification = (message: string) => {
+  //   setNotifications((prev) => [...prev, message]);
+  //   setTimeout(() => {
+  //     setNotifications((prev) => prev.slice(1));
+  //   }, 5000); // Notification disappears after 5 seconds
+  // };
+
+  // // Monitor for critical conditions
+  // useEffect(() => {
+  //   if (incubator) {
+  //     const checkCriticalConditions = () => {
+  //       const criticalMetrics = [];
+
+  //       if (incubator.temperature < 20 || incubator.temperature > 35) {
+  //         criticalMetrics.push("Temperature");
+  //       }
+  //       if (incubator.humidity < 30 || incubator.humidity > 70) {
+  //         criticalMetrics.push("Humidity");
+  //       }
+  //       if (incubator.airQualityIndex > 100) {
+  //         criticalMetrics.push("Air Quality Index");
+  //       }
+  //       if (incubator.uvRadiation > 5) {
+  //         criticalMetrics.push("UV Radiation");
+  //       }
+  //       if (incubator.flameDetected) {
+  //         criticalMetrics.push("Flame Detected");
+  //       }
+  //       if (incubator.lightIntensity > 2000) {
+  //         criticalMetrics.push("Light Intensity");
+  //       }
+
+  //       if (criticalMetrics.length > 0) {
+  //         criticalMetrics.forEach((metric) => {
+  //           addNotification(`${metric} is in a critical condition!`);
+  //         });
+  //       }
+  //     };
+
+  //     const isRealTime =
+  //       selectedDateTime.toISOString().split("T")[0] ===
+  //       new Date().toISOString().split("T")[0];
+
+  //     if (isRealTime) {
+  //       checkCriticalConditions();
+  //     }
+  //   }
+  // }, [incubator, selectedDateTime]);
+
+  // // Render notifications
+  // const renderNotifications = () => (
+  //   <div className="notifications-container">
+  //     {notifications.map((message, index) => (
+  //       <Notification
+  //         key={index}
+  //         message={message}
+  //         onClose={() =>
+  //           setNotifications((prev) => prev.filter((_, i) => i !== index))
+  //         }
+  //       />
+  //     ))}
+  //   </div>
+  // );
+
 
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
 
@@ -146,7 +252,7 @@ export const MonitoringDashboard = () => {
 
     try {
       const docRef = doc(dbA, "values", dateTime);
-
+      
       const unsubscribe = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
           clearTimeout(timeout);
@@ -175,7 +281,7 @@ export const MonitoringDashboard = () => {
       setLoading(false);
     }
   };
-
+  
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -274,7 +380,10 @@ export const MonitoringDashboard = () => {
         <div className="flex justify-end mb-6 mr-9">
           <DatePicker
             selected={selectedDateTime}
-            onChange={(date: Date) => setSelectedDateTime(date)}
+            // onChange={(date: Date) => setSelectedDateTime(date)}
+            onChange={(date: Date | null) => {
+              if (date) setSelectedDateTime(date);
+            }}
             dateFormat="yyyy-MM-dd'T'HH:mm"
             showTimeSelect
             timeFormat="HH:mm"
@@ -307,7 +416,7 @@ export const MonitoringDashboard = () => {
           {/* Video Feed */}
           {selectedDateTime.toISOString().split("T")[0] === new Date().toISOString().split("T")[0] ? (
             <iframe
-              src={`https://192.168.61.246/`}
+              src={`http://192.168.61.246/`}
               width="100%"
               height="100%"
               className="rounded-xl border-2 border-gray-100"
@@ -437,3 +546,11 @@ export const MonitoringDashboard = () => {
 };
 
 export default MonitoringDashboard;
+function fetchRealTimeData() {
+  throw new Error("Function not implemented.");
+}
+
+function fetchHistoricalData(selectedDateTime: Date) {
+  throw new Error("Function not implemented.");
+}
+
